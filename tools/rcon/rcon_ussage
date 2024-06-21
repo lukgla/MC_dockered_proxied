@@ -1,0 +1,1 @@
+.\mcrcon.exe -t  -p <rcon_password> -H <external_ip>

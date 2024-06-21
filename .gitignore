@@ -1,0 +1,5 @@
+peer1.conf
+wg0.conf
+# server.properties
+standalone-wg-master/*
+tmp/*
