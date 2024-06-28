@@ -1,3 +1,3 @@
 source config.bash
 
-docker build --file=dockerfile -t $DOCKER_USER/$REMOTE_PROXY_NAME ./remote_proxy
+docker build --file=./remote_proxy/dockerfile -t $DOCKER_USER/$REMOTE_PROXY_NAME ./remote_proxy

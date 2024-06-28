@@ -46,5 +46,33 @@ Create network for server and server proxy
 ```
 docker network create -d bridge --subnet=172.20.0.0/16 --opt com.docker.network.driver.mtu=1420 server-mc-network
 ```
-sometimes you would need to change mtu (wireguard mtu is lower than default docker mtu)
+we must change default mtu (wireguard mtu is lower than default docker mtu)
 
+Server proxy:
+```
+PostUp = iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE; iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 172.20.0.30:25565; iptables -t nat -A PREROUTING -p tcp --dport 25575 -j DNAT --to-destination 172.20.0.30:25575
+```
+Simple forward, consist of enabling nat, forwarding *:25565(default mc port) to 172.20.0.30(internal ip of mc server):25565, forwarding *:25575(default mc RCON)
+
+And cleanup (-A (append) changed to -D (delete) )
+```
+PreDown = iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE; iptables -t nat -D PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 172.20.0.30:25565; iptables -t nat -D PREROUTING -p tcp --dport 25575 -j DNAT --to-destination 172.20.0.30:25575
+```
+
+Additionally server proxy is behind nat so we need to hold connection, to not lose connection. (wireguard is silent by default, this will keep connection open)  
+```
+PersistentKeepalive = 25
+```
+
+
+Remote proxy:
+Exactly the same but forward to tunnel
+```
+PostUp = iptables -t nat -A POSTROUTING -o wg+ -j MASQUERADE; iptables -t nat -A PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 10.13.13.2:25565; iptables -t nat -A PREROUTING -p tcp --dport 25575 -j DNAT --to-destination 10.13.13.2:25575
+```
+```
+PreDown = iptables -t nat -D POSTROUTING -o wg+ -j MASQUERADE; iptables -t nat -D PREROUTING -p tcp --dport 25565 -j DNAT --to-destination 10.13.13.2:25565; iptables -t nat -D PREROUTING -p tcp --dport 25575 -j DNAT --to-destination 10.13.13.2:25575
+```
+
+Trace:
+(External IP) -> remote_proxy nat forward to tunnel -> server_proxy nat forward to (mc) server -> (mc) server 

@@ -1,21 +1,21 @@
 FROM ubuntu AS build
 RUN apt-get update && apt-get install -y unzip wget
 # your modpack server files
-RUN wget https://github.com/TerraFirmaGreg-Team/Modpack-1.20.x/releases/download/0.7.8/TerraFirmaGreg-1.20.x-0.7.8-server.zip
-RUN unzip TerraFirmaGreg-1.20.x-0.7.8-server.zip
+RUN wget https://mediafilez.forgecdn.net/files/5394/657/TerraFirmaGreg-1.20.x-0.7.12-server.zip
+RUN unzip TerraFirmaGreg-1.20.x-0.7.12-server.zip
 
 FROM gcr.io/distroless/java17-debian12 AS run
 # copy mods and more
 COPY --from=build --chown=root:root /.minecraft /mc
 # add custom configs and mods
 COPY .minecraft/ /mc/
-# load word, if empty it will be generated later
-COPY word/ /mc/word/ 
+# load world, if empty it will be generated later
+COPY world/ /mc/world/ 
 
 # server files must be a volume, becouse libraries and etc need to update and there is no way to update and stop in build mode
 VOLUME [ "/mc" ]
-# save word into separate volume to allow for script server update when new version arrive
-VOLUME [ "/mc/word" ]
+# save world into separate volume to allow for script server update when new version arrive
+VOLUME [ "/mc/world" ]
 
 #server
 EXPOSE 25565
@@ -23,4 +23,5 @@ EXPOSE 25565
 EXPOSE 25575
 
 WORKDIR /mc
-ENTRYPOINT ["java","-jar","minecraft_server.jar","-Xmx20460M","-Xms6024M","nogui"]
+ENTRYPOINT ["java","-jar","minecraft_server.jar"]
+CMD [ "max_ram","min_ram","nogui" ]

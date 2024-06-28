@@ -4,7 +4,7 @@ source config.bash #load env
 docker network create -d bridge --subnet=172.20.0.0/16 --opt com.docker.network.driver.mtu=1420 $DOCKER_NETWORK_NAME
 
 # use image to generate secrets
-docker run -rm --it --name config_creator \
+docker run --rm -it --name config_creator \
   --cap-add=NET_ADMIN \
   --cap-add=SYS_MODULE \
   -e PUID=1000 \

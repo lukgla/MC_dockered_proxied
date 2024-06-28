@@ -19,7 +19,7 @@ docker run -d \
   --network=$DOCKER_NETWORK_NAME \
   --ip=172.20.0.30  \
   -v $MC_VOLUME:/mc  \
-  -v $MC_WORD_VOLUME:/mc/word \
+  -v $MC_WORD_VOLUME:/mc/world \
   -p 25565:25565 -p 25575:25575 \
-  --entrypoint="java -jar minecraft_server.jar -Xmx$SERVER_MAX_RAM -Xms$SERVER_MIN_RAM nogui" \
-  $DOCKER_USER/$SERVER_MC_NAME:$MC_VERSION
+  $DOCKER_USER/$SERVER_MC_NAME:$MC_VERSION \
+  -Xmx$SERVER_MAX_RAM -Xms$SERVER_MIN_RAM nogui \
